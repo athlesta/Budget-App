@@ -1,0 +1,1186 @@
+  /lec 6.5
+Implementing the modular pattern
+
+private, public data exposing methods, data encapsulation,separation of concersns..
+why we need module? 
+ we need separate independant organised units
+so inside a module only the module has access to the data inside (so this is called data encapsulation)
+  this allow us to hide the implemenatation details of a specific module from the outside scope .
+the only thing that we expose is the public interface ie API
+
+so modules are implemented using the modular pattern , ie implemented using closures and IIFEs
+
+so first module :-  'budgetController'
+so this is a  variable , is an IIFE , that will return a object. (iife is anonymous function wrapped inside a parenthesis)
+
+IIFE allow us to have data privacy bcz it itself create a new scope that is not visible from outside scope, 
+
+the SECRET of modular pattern is , it returns an object containing all of the functions that we want to be public.  
+
+
+
+// note our function 
+
+so here, x and the function add, both are private, budgetController.x vazhi we can't access the x variable.
+
+note:- publicTest is also a method, but this one is returned by budgtCtr, therefore its accessible from outside 
+publicTest was the method that we made exposed .
+
+so analysis:- 
+
+here:- on the first line of code , the iife is invoked, thus var x, function add will be executed , and what gets into the budgetController variable is the methos publicTest.bcz thats what the iife has returned after execution.
+now publicTest it self being a function / method it uses x and add, all bcz of power of closures (even though iife has executed , ie add ellam neerathe executed )
+
+
+similarly we have to create module for userinterface, so we create this too by following the modular pattern,
+
+these 2 modules are completely independant to each other, so there will be no interaction bw both, both are standalone , its adv:- suppose later we need to change the UI, just change this module , that's it .
+
+so separating the modules in this way is called separation of concerns
+
+these 2 modules are now connected by the Controller module:-
+ so this module is what that connects bw the other 2 modules, hence its iife must have these modules as its arguments.
+
+ //see the code
+
+
+
+its the architecture of the project, or the code 	
+..............................................................................
+
+LEC 6.6 :-Add first Event Listener
+
+WE ARE adding eventListener here,  So for that we need an event here, then we use querySelector method to add event. so class attached to the button vazhi we access the class, 
+note:- querySelector uses same syntax as class Selectors, ie '.' will be there with the class name :- '.add__btn', so in this we add addEventListner for click event and the function which get executed  the task on 'click' event. 
+
+
+NOTE:- this code  
+document.querySelector('.add__btn').addEventListener('click', function(){
+        console.log('Yes, clicked ! ');
+    })
+    
+
+
+ //so actually what we want during this event happens is shown below
+    //to do list
+    
+    //1. Get the field input data
+    
+    //2. Add the item to budgetController
+    
+    //3.Add the item to UI
+    
+    //4.Calculate budget
+    
+    //5. Display the budget on the UI
+    
+we let the same happens, when anyone presses the Enter key too... 
+
+so we want that all happen during our 'keypress event' too
+
+note:- this event is not based on any button or so, thus no need to select anything, we add this event listener to global document. bcz, keypress doesnt happen on any specific element but it happens on global webpage..
+
+
+
+there are multiple events happen during a keypressing happen, so for us we use the event :- 'keypress'  
+
+//so see our code :=-the function we need to execute on the event, also accepts an argument. 
+we name it 'event' so this event object has a property of 'keycode', we use this inorder to distinguish the keys.
+
+older browser has event.which , instead of keycode.
+
+our code :-- 
+  document.addEventListener('keypress', function(event){
+        if(event.keyCode===13){
+            console.log('Enter was pressed .');    
+        }
+        
+    })
+
+now on both click event and keypress event we want to happen the same set of operations, BUT WE USE DRY PRINCIPLE.  THUS  we use a custom function again.
+
+so we just simply call this function during any event occurs.
+
+so our final code looks as:-
+
+
+    var ctrlAddItem=function(){
+        //to do list
+    
+        //1. Get the filled input data
+    
+        //2. Add the item to budgetController
+    
+        //3.Add the item to UI
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+    }
+    document.querySelector('.add__btn').addEventListener('click',ctrlAddItem)
+    //so actually what we want during this event happens is shown below
+    
+    document.addEventListener('keypress', function(event){
+        if(event.keyCode===13){
+            ctrlAddItem();    
+        }
+        
+    });
+..............................................................................
+
+lec 6.7 Read input data
+
+
+here we read data from diff HTML input types    
+
+so basic layout, is UX related stuffs, we will ask for UXcontroller, then the UXcontroller is controlled from global app controller
+
+
+so input from field is actually a UI stuff, so we will write a method in UXcontroller, then we call it in the controller module to access it .
+
+
+so in UI controller the method returns the the field's data:-  so we need the input values from the classes:- add__type, add__description, add__value,
+
+so example:- var type=document.querySelector('.add__type').value;
+ie a varible kke, we assign the value from input field using 'value' property
+
+so our code looks like:-
+
+        getInput: function(){
+            var type=document.querySelector('.add__type').value; //will be inc or exp
+            var description=document.querySelector('.add__description').value;
+            var valur=document.querySelector('.add__value').value;
+        }
+
+so when the method is called , the data is stored in 3 variables, nothing returned , so wht we do is return the object containing 3 ppty on the method call,
+
+thus it looks like :- 
+
+//inside the UIController
+
+ getInput: function(){
+            return {
+             type : document.querySelector('.add__type').value, //will be inc or exp
+             description :document.querySelector('.add__description').value,
+             value : document.querySelector('.add__value').value
+            };
+            
+        }
+
+// the function call at Controller module
+
+var input=UCtrl.getInput();
+
+(the whole function till this point)
+
+ var ctrlAddItem=function(){
+        //to do list
+    
+        //1. Get the filled input data
+        var input=UCtrl.getInput();
+        console.log(input);
+    
+        //2. Add the item to budgetController
+    
+        //3.Add the item to UI
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+       
+    }
+
+////////////////////////////////////////////////////////////////////
+
+Now we have a problem. the querySelector classes, ellam are manually coded inside the real name, once if we change the UI, this whole pieces of name (.add__value, .add__description) have to be changed, and can cause bucks. hence we solve this problem by mapping these names with internal varible using DOMstrings method.
+its declared inside UIController, 
+var DOMstrings={
+        inputType: '.add__type',
+        inputDescription: '.add__description',
+        inputValue: '.add__value' 
+    };
+
+
+now we have hard coded string inside , the Controller module too , so we expose this DOMstrings object to public, so that Controller too can have access on it . 
+and this is done by;- getDOMstrings: function(){
+		return DOMstrings;
+		}
+
+
+
+
+// the final code after the lec 7 looks like :-
+
+
+//BUDGET CONTROLLER
+var budgetController=(function(){
+    
+    //some code here
+    
+    
+    
+})();
+
+//UI CONTROLLER
+var UIController=(function(){
+    
+    var DOMstrings={
+        inputType: '.add__type',
+        inputDescription: '.add__description',
+        inputValue: '.add__value',
+        inputBtn:'.add__btn'
+    };
+    
+    
+    return  {
+        getInput: function(){
+            return {
+             type : document.querySelector(DOMstrings.inputType).value, //will be inc or exp
+             description :document.querySelector(DOMstrings.inputDescription).value,
+             value : document.querySelector(DOMstrings.inputValue).value
+                };
+        },
+            
+        getDOMstrings: function(){
+            return DOMstrings;
+            }
+    };    
+    
+})();
+
+
+//GLOBAL APP CONTROLLER
+var Controller= (function(bdgtCtrl, UCtrl){
+
+    
+    var DOM=UCtrl.getDOMstrings();
+    
+    var ctrlAddItem=function(){
+        //to do list
+    
+        //1. Get the filled input data
+        var input=UCtrl.getInput();
+        console.log(input);
+    
+        //2. Add the item to budgetController
+    
+        //3.Add the item to UI
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+        
+    }
+    document.querySelector(DOM.inputBtn).addEventListener('click',ctrlAddItem)
+    //so actually what we want during this event happens is shown below
+    
+    document.addEventListener('keypress', function(event){
+        if(event.keyCode===13){
+            ctrlAddItem();    
+        }
+        
+    });
+    
+    
+})(budgetController, UIController);
+
+..............................................................................
+
+lec 6.8
+
+SO why we need an initialization function:-
+in the Controller module, the eventlistners are scattered around , so inorder to organise it , we keep all the eventlistner under one umbrella, ie oru common function.
+
+so it looks like this:-
+
+    
+    var setupEventListners=function(){
+        var DOM=UCtrl.getDOMstrings();
+        document.querySelector(DOM.inputBtn).addEventListener('click',ctrlAddItem);
+        //so actually what we want during this event happens is shown below
+    
+        document.addEventListener('keypress', function(event){
+            if(event.keyCode===13){
+                ctrlAddItem();    
+            }
+        
+    });
+        
+        
+    }
+    
+now , setupEventListners and ctrlAdditem are private function, they are not executed unless they are called, earlier, this were in context of iife, so they get automatically executed. now situation is all eventlistners are under the setupeventlistners function, so this function has to be called. 
+
+so we return init function, were it calls the setupEventListener() , {for now}.
+
+then we need to call it now:- Controller.init();
+
+after lec 6.8 our code looks like this :
+    
+/*************************************************************************************************************************
+						OUR CODE NOW 
+************************************************************************************************************************/
+
+
+
+//BUDGET CONTROLLER
+var budgetController=(function(){
+    
+    //some code here
+    
+    
+    
+})();
+
+//UI CONTROLLER
+var UIController=(function(){
+    
+    var DOMstrings={
+        inputType: '.add__type',
+        inputDescription: '.add__description',
+        inputValue: '.add__value',
+        inputBtn:'.add__btn'
+    };
+    
+    
+    return  {
+        getInput: function(){
+            return {
+             type : document.querySelector(DOMstrings.inputType).value, //will be inc or exp
+             description :document.querySelector(DOMstrings.inputDescription).value,
+             value : document.querySelector(DOMstrings.inputValue).value
+                };
+        },
+            
+        getDOMstrings: function(){
+            return DOMstrings;
+            }
+    };    
+    
+})();
+
+
+//GLOBAL APP CONTROLLER
+var Controller= (function(bdgtCtrl, UCtrl){
+
+    
+
+        var setupEventListners=function(){
+            var DOM=UCtrl.getDOMstrings();
+            document.querySelector(DOM.inputBtn).addEventListener('click',ctrlAddItem);
+            //so actually what we want during this event happens is shown below
+
+            document.addEventListener('keypress', function(event){
+                if(event.keyCode===13){
+                    ctrlAddItem();    
+                }
+ 
+        });
+
+
+        };
+
+
+    
+    
+    var ctrlAddItem=function(){
+        //to do list
+    
+        //1. Get the filled input data
+        var input=UCtrl.getInput();
+        console.log(input);
+    
+        //2. Add the item to budgetController
+    
+        //3.Add the item to UI
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+        
+    };
+    return {
+        init : function(){
+            console.log("application has started!")
+            setupEventListners();
+        }
+    }
+    
+})(budgetController, UIController);
+
+
+
+Controller.init();
+
+{so all the code that we want to execute at the beginning of the code ,are called using the init function , (till now its just the eventlistners )} 
+/*************************************************************************************************************************
+						END OF CODE 
+************************************************************************************************************************/
+
+Lec 6.9
+
+now its time to think about the structure or the way in which data must be stored in bdgetController(bc) module, so the data we keep in bc module is income, expense , and the budget that we calculate from income and expense, so income / expense itself has 1. a description, 2. a value, 3. an ID (for uniquely identifying it).
+
+so the data structure suitable for this is an object for income as well as expense, so we will have lots of these objects, so we need to create these object for each entry of income n expense, so we create a function constructor for both income and expense. (diff aayikotte, bcz in the end both the object diff aavum) .
+
+ var Expense=function(id, description, value){
+        this.id=id;
+        this.description=description;
+        this.value=value;
+    };
+    
+    var Income=function(id, description, value){
+        this.id=id;
+        this.description=description;
+        this.value=value;
+    };
+    
+
+then , if we need to create methods to this objects aengil, what we do is we assign the methods in prototype so that the objects would inherits the methods if required.
+note:- the function constructor okke is inside the bc module, therefore it is a private member. 
+
+now the bc module, takes care of all the incomes, expenses, budget, percentages . so suppose 10 income undegil we need 10 income object , so were to store these 10  object together, so we need a ds for this, best option is an array like :-
+allExpense=[];
+allIncome=[];
+//and for total calculation
+totalExpenses=0;
+totalIncomes=0
+
+
+
+again we can simplfy this, bcz, inside the bc module we have random variables they are not organised under a common name , so that when lots of data flows, its easier to get access for :-
+what we meant is this ::-
+
+    var data={
+        allItems :{
+            exp:[],
+            inc:[]
+        },
+        totals:{
+            exp:0,
+            inc:0
+        }
+    }
+    
+    
+so its totalyy get organised.    
+    
+/*************************************************************************************************************************
+						OUR CODE NOW (only bc module)
+************************************************************************************************************************/
+//BUDGET CONTROLLER
+var budgetController=(function(){
+    
+    //some code here
+    
+    var Expense=function(id, description, value){
+        this.id=id;
+        this.description=description;
+        this.value=value;
+    };
+    
+    var Income=function(id, description, value){
+        this.id=id;
+        this.description=description;
+        this.value=value;
+    };
+    
+    var data={
+        allItems :{
+            exp:[],
+            inc:[]
+        },
+        totals:{
+            exp:0,
+            inc:0
+        }
+    } 
+    
+})();
+
+/*************************************************************************************************************************
+						END OF CODE 
+************************************************************************************************************************/
+
+Lec 6.10
+
+here we are adding new items typed in the input data field into the budget controller module il ulla DS.
+
+so input fields data to input into bc module, we need to make a method that is pubic in bc module. so that when ever input field comes, this method is called and this method adds data from input field to the bc module ds.
+
+so bc module will return the method, we call this 'addItem'.
+notE:- addItem is an object ie is returned by the bc module, therefore it is inside the return{....};
+
+part  1:-
+
+addItem : function(type, des,val){
+            var newItem,ID
+            
+            ID=0;
+            if(type==='exp'){
+                newItem=new Expense(ID,des,val);
+            }else{
+                newItem=new Income(ID,des,val);
+            }
+            
+        }
+        
+(explan:- the addItem is a function with argument as type, des, val. bcz input we get from getInput method of UIController, so our aim is first step, create an object either inc / exp based on the type ie what shown above, we can see that function constructor also has argument as ID, this we will take care later, rest of the things like des, val will be passed directly from getInput to function constructor as shown in the code . )
+
+
+................
+
+now the obj is created , but the collection of object resides on the arrays inc/ exp inside the allItems obj. so the newly created obj has to be pushed inside the arrays.
+
+so code for that :- ( if new obj is an expense obj then, ) == data.allItems.exp.push(newItem);
+but type 'll return a string 'exp', or 'inc'. so again if else nokkathe , we can take adv of that .
+
+ie, 
+data.allItems[type].push(newItem);
+
+ part 2:-
+(code looks like )
+
+    	addItem : function(type, des,val){
+            var newItem,ID
+            
+            ID=0;
+            if(type==='exp'){
+                newItem=new Expense(ID,des,val);
+            }else{
+                newItem=new Income(ID,des,val);
+            }
+            
+            data.allItems[type].push(newItem);
+            
+        }
+        
+    	return newItem;    
+    };
+	 (why we return the newItem , bcz other functions that calls this method can get direct access of the newItem)
+  .................................  
+now "ID" for the newItem has to be resolved,  for that ,note: all ID should be unique, so simple soln ll be length +1, pakshe on deletion if taken care length+1 can cause trouble 
+so what we can do to be sure that ID is unique is :- we go to the last added obj of the array( this is accessible by length -1 , know its id then aa id +1 can be a solution) and this is what we do 
+
+ID=data.allItems[type][data.allItems[type].length - 1].id +1;
+
+(note:- this ID creation has a catch , if we insert the very first element this one won't work, so that has to be taken care, check on out real script code .)
+
+.......................................
+
+So this step was actually 2. of ctrlAddItem, so update that. 
+hence it include now::-
+
+  var ctrlAddItem=function(){
+        
+        var input, newItem;
+        
+        //to do list
+    
+        //1. Get the filled input data
+        input=UCtrl.getInput();
+        console.log(input);
+    
+        //2. Add the item to budgetController
+        newItem=bdgtCtrl.addItem(input.type,input.description,input.value);
+        
+        //3.Add the item to UI
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+        
+    };
+..................................................
+*********************************************************************************************************************************************************************************************
+
+Lec 6.11 adding the newItem to the UI
+
+So now we need to display the item, ie the object we created in the previous lec on the UI, so for that we create a method :-addListItem(), its argument will be obj, type. obj== newItem of prev lecture, and type is inc or exp. 
+
+so there are 3 steps in this method:-
+1. we need to create a html string witht placeHolder tag
+2. replace placeHolder with actual data from obj object
+3.insert the HTML into the DOM
+
+
+so step 1:
+
+this is what the html looks like for the income item :-  
+			<div class="item clearfix" id="income-0">
+                            <div class="item__description">Salary</div>
+                            <div class="right clearfix">
+                                <div class="item__value">+ 2,100.00</div>
+                                <div class="item__delete">
+                                    <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+
+similarly we have for expense to a div tag that specifies how expense item appear in the UI. So what we want to do in step1. is create the HTML string based on the type . if its exp then the string corresponding to it, else if income then acc to it.
+
+
+so code is :-(here we have replaced the data which is actually req to fill from the obj object, by placeHolder tags, just to identify while we are changing it , atre ullu, so placeHolder tags looks like :- %description% so on....)
+
+
+addListItem:function(obj, type ){
+          
+            var html;
+            //1. create an HTML string with placeHolder tags
+            if(type==='inc'){
+                html='<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'            
+            }else if(type==='exp'){
+                html= '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+
+            }
+            
+...................................................
+step 2:-
+
+ now we need to replace the placeHolder tags with actual data, we use the method 'replace' that is used with the string, (bcz the html used in step 1 is a string) 
+
+var newHtml=html.replace('%id',obj.id);
+newHtml=newHtml.replace('%description%',obj.description);
+newHtml=newHtml.replace('%value%, obj.value);
+
+obj.id, obj.value all are the properties of the obj object created using the Expense and Income function constructor.
+
+...................................................
+step 3:-
+ NEXT	we need to do is insert it to the DOM, its new thing we didn't do before.
+
+for this we use insertAdjacentHtml method. so for this first we select an element, and we have 4 positons to add the html thing, two at sibling positions, and two at child positions, so check refernce for more.
+
+so in our case the element is :- income__list (it is a container [div tag]) for income, expense__list (it is a container [div tag]) for expense. we add the html things at sibling position 'beforeend'
+
+so all the data of obj object we want to make available in the UI is actually child of these respective containers.
+
+so based on the type we need to select the container , so that is what the variable 'element' will do , we got new property in DOMStrings too the income__Container and expenses__Container	
+
+updated DOMStrings:-
+
+   var DOMstrings={
+        inputType: '.add__type',
+        inputDescription: '.add__description',
+        inputValue: '.add__value',
+        inputBtn:'.add__btn',
+        incomeContainer:'.income__list',
+        expenseContainer:'.expenses__list'
+    };
+    
+
+and the step 3 :- is 
+
+            //3.insert the HTML into DOM
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+
+   
+/*************************************************************************************************************************
+					OUR CODE NOW (only UIConroller module)
+************************************************************************************************************************/
+
+
+  addListItem:function(obj, type ){
+          
+            var html,newHtml,element;
+            //1. create an HTML string with placeHolder tags
+            if(type==='inc'){
+                
+                element=DOMstrings.incomeContainer;
+                
+                html='<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'            
+            }else if(type==='exp'){
+                element=DOMstrings.expenseContainer;
+                
+                html= '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+
+            }
+            
+            
+            //2.replace the placeHolder with actual data from obj object
+            newHtml=html.replace('%id',obj.id);
+            newHtml=newHtml.replace('%description%',obj.description);
+            newHtml=newHtml.replace('%value%, obj.value);
+
+            
+            
+            
+            //3.insert the HTML into DOM
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+            
+            
+        }
+
+/*************************************************************************************************************************
+						END OF CODE 
+************************************************************************************************************************/
+
+
+
+[TILL NOW WE HAVE CREATED, BUT IT WON'T WORK BCZ, WE HAVENT CALLED IT YET, WE NEED TO CALL IT ]
+
+so calling happens in ctrlAddItems function inside the controller module, it is its step 3. (check)
+
+
+    
+    var ctrlAddItem=function(){
+        
+        var input, newItem;
+        
+        //to do list
+    
+        //1. Get the filled input data
+        input=UCtrl.getInput();
+        //console.log(input);
+    
+        //2. Add the item to budgetController
+        newItem=bdgtCtrl.addItem(input.type,input.description,input.value);
+        
+        //3.Add the item to UI
+        UCtrl.addListItem(newItem,input.type)
+        
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+        
+    };
+*********************************************************************************************************************************************************************************************
+Lec 6.12 Clearing our Input field
+
+the input fields will remain uncleared, and it holds the last item that we have added, so we need to clear it after its shown in UI. so this is what we have to do in userInterface , hence we need to go to UIController.
+
+so here we use querySelectorAll inorder to select the input fields tags, instead of doing querySelector twice, since we need to clear to input fields. 
+so in querySelectorAll its arguments are classes .add__value, .add__description, but in code we use its mapped var from DOMStrings.
+
+the format of argument for querySelectorAll , is a strings containing CSS selectors separated by comma. it looks like this :-
+
+so code looks like this:-
+
+        clearFields:function(){
+            var fields;
+            
+            fields=document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+            
+            
+        }
+
+NOw small probs und, here  the querySelectorAll returns a list not an array , so we need a setup to convert the list into an array, then store these into a array variable, (explained in 4:00 to 6:22 lec 6.12)
+
+var fieldsArr= Array.prototype.slice.call(fields);
+
+after this ,
+ we can loop over the array and cancel all these fields one by one . so we can do this using for loop, but instead of that we are using here foreach method to loop.
+how foreach() method works is , pass a callback function, and this function gets worked in all the elements of the array. (same as eventListeners, check if have dbt)
+
+so the method looks like :-
+
+   clearFields:function(){
+            var fields,fieldsArr;
+            
+            fields=document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+            fieldsArr=Array.prototype.slice.call(fields); 
+            
+            fieldsArr.forEach(function (current, index, array){
+                current.value= "";
+                
+            });
+            
+        }
+
+AGAIN WE HAVE JUST MADE THE METHOD DIDN'T CALLED IT YET, SO WE CALL IT IN Controller Module ,through ctrlAddItem function.
+
+updated ctrlAddItem function:-
+
+   
+    var ctrlAddItem=function(){
+        
+        var input, newItem;
+        
+        //to do list
+    
+        //1. Get the filled input data
+        input=UCtrl.getInput();
+        //console.log(input);
+    
+        //2. Add the item to budgetController
+        newItem=bdgtCtrl.addItem(input.type,input.description,input.value);
+        
+        //3.Add the item to UI
+        UCtrl.addListItem(newItem,input.type)
+        
+        //3.a clear the fields
+        UCtrl.clearFields();    
+    
+        //4.Calculate budget
+    
+        //5. Display the budget on the UI
+        
+        
+    };
+
+.............................................
+
+atlast just change the focus to the first input field, for that we use ,
+
+fielsArr[0].focus();
+
+*********************************************************************************************************************************************************************************************
+Lec 6.13
+
+here we fix minor problems, ie false input if it comes , we need to avoid those . also the inputs that comes as strings has to be converted into numbers.
+
+so now looking into ctrlAddItem method, its last to steps:-
+
+ //4.Calculate budget
+    
+ //5. Display the budget on the UI,
+we are not hardcoding write down there itself, for 2 reasons:- 1. budget has to be calculated when we have to delete the items too, so better create a separate method and call acc, ie we maintain the DRY Principle.
+
+step:- 4 we do by:- updateBudget() method. and we call them in ctrlAddItem. 
+
+NOW 2 things TO take care:- 
+Salary , 1200 : here the 1200 is string that we get throught the getinput method , we need to convert it to a float, (chillara okke kykaaryam cheyyan , else just int mathiaayirunnu) 
+
+ so we use parseFloat();
+
+inside the getInput method:-
+ value : parseFloat(document.querySelector(DOMstrings.inputValue).value)
+
+
+Another problem that we have is :- even when the fields are empty the items get poured in, the list , so we need to update it only when there are items in the list.
+
+ie step2 - step10 in ctrlAddItems must be performed only when there are valid items inside the fields.
+
+updateds ctrlAddItems method:-
+
+  var ctrlAddItem=function(){
+        
+        var input, newItem;
+        
+        //to do list
+    
+        //1. Get the filled input data
+        input=UCtrl.getInput();
+        //console.log(input);
+        
+        if(input.description != "" && !isNaN(input.value) && input.value>0)
+            {
+                
+                //2. Add the item to budgetController
+                newItem=bdgtCtrl.addItem(input.type,input.description,input.value);
+        
+                //3.Add the item to UI
+                UCtrl.addListItem(newItem,input.type)
+        
+                //3.a clear the fields
+                UCtrl.clearFields();    
+    
+                //4.Calculate and update budget
+                updatBudget();
+            }
+        
+    };
+*********************************************************************************************************************************************************************************************
+Lec 6.14
+
+Calculate the budget ,
+
+so this happens in the bc module.
+
+so we need to calculate total income. total expenses, calculate the budget (income - expense) , then percentage too
+
+
+calculateBudget: function(){
+
+	//1. calculate total expense
+	
+	//2. calculate budget ;- income-expense
+	
+	//3. calculate percentage 
+}
+
+so to calculate total income ,expenses, we use again a function, (a helping function) to calculateBudget, It will be an internal private function
+
+   var calculateTotal= function(type){
+       var sum=0;
+       data.allItems[type].forEach(function(curr){
+           sum+=curr.value;
+           
+        data.totals[type]=sum;
+       });
+       
+        
+and this is called by calculateBudget() method;
+
+now calculating Budget:-
+ 
+where is budget stored? so new property in the global method have to be created to store the budget
+
+updated global structure:-
+
+ var data={
+        allItems :{
+            exp:[],
+            inc:[]
+        },
+        totals:{
+            exp:0,
+            inc:0
+        },
+        budget : 0,
+        percentage : -1
+    }
+.............................................
+    
+calculateBudget function completed:-
+
+ calculateBudget: function(){
+
+	       //1. calculate total expense
+	       calculateTotal('exp');
+           calculateTotal('inc');
+            
+	       //2. calculate budget ;- income-expense
+            data.budget=data.totals.inc - data.totals.exp;
+	
+	       //3. calculate percentage 
+            data.percentage=Math.round((data.totals.exp/data.total.inc) * 100);
+
+
+        }
+ ............................................................
+now calculated things have to be made available to others functions, for that purpose we use the getBudget() method. bcz updateBudget method inside ctrlAddItem used to have its second dstep as return the calculated budget data.
+
+	getBudget: function(){
+            return {
+                budget: data.budget,
+                totalInc : data.totals.inc,
+                totalExp: data.totals.exp,
+                percentage: data.percentage
+            };
+        }
+
+this is the function inside the bc module. so this will be called at updateBudget() method inside controller module, which in turn is used by the ctrlAddItems method.
+
+suppose we only have expense , then percentage == infinity, so this problem also must be cleared out.
+
+*********************************************************************************************************************************************************************************************
+lec 6.15
+
+we start displayBudget() with the init function with initial values as zeros, to avoid the weird numbers present . 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------												PART 2
+*********************************************************************************************************************************************************************************************
+***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+lec 6.16
+
+Part 2 to do list :-
+
+1. we need to add eventListener for deleting the items
+2. delete items from data Structure
+3. delete the item from UI
+4. recalculate the budget 
+5. show it in the UI
+
+
+Lec 6.17 
+(things to be learned before deleting an item,especially when we are interacting with the DOM)
+
+
+Event delegation :-
+ 
+Event Bubbling:- it means , suppose we triggered or an event was fired on a DOM element , same event gets triggered to its parent elements too one at a time. Untill it reaches the root, so an event bubbles up inside a DOM tree, and thats why it is called as event bubbling.
+
+The element that caused the event to happen is called the :- TARGET ELEMENT
+
+so event that triggers already know the target element. Now suppose the bubble is created we need to catch the bubble at some point, so for that purpose we add eventhandler at a parent element were we want to catch the bubble , this process is called EVENT DELEGATION.
+
+SO 2 PLACES WERE WE USE THE EVENT DELEGATION IS :-
+
+1. When we have an element with lots of child elements that we are interseted in 
+2. When we want an event handler attached to an element that is not yet in the DOM when out page is loaded .
+*********************************************************************************************************************************************************************************************
+ Lec 6.18		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
